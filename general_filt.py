@@ -1,5 +1,5 @@
 import numpy as np
-from sensors import Measurement_device
+from .sensors import Measurement_device
 
 class Kalman:
     def __init__(self, x0: np.ndarray, p0: np.ndarray, F: np.ndarray, Q:np.ndarray, G:np.ndarray, dt: float=0.1):

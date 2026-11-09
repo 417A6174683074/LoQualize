@@ -1,4 +1,4 @@
-from space import Movement2D#, Circular2d, Space2D
+from .movements.space import Movement2D#, Circular2d, Space2D
 import numpy as np
 from typing import Tuple
 
