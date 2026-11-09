@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from space import Space2D, Circular2d
 from sensors import IMU2D, Satellite2D
-from filter import IMUEKF2D
 from general_filt import Kalman
 
 """for detailed explanation on kalman filters check
