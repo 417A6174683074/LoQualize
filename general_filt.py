@@ -20,12 +20,18 @@ class Kalman:
         self.P = self.F@self.P@self.F.T+self.Q
         self.P=(self.P+self.P.T)/2  # bcs it is suppose to be symmetric
 
-    def update(self, z, h, H, R):
+    def update(self, z, h, H, R, gate=None):
             y = z-h
             S = H@self.P@H.T+R
+            if gate is not None:
+                # innovation gate (Mahalanobis / NIS test): skip measurements that are wildly
+                # inconsistent with the prediction -- needed for nonlinear sensors like the gravimeter
+                nis = float(y@np.linalg.solve(S, y))
+                if nis > gate**2:
+                    return y, None            
             K = np.linalg.solve(S, H@self.P).T
             self.x = self.x + K@y
-            I = np.eye(11)
+            I = np.eye(len(self.x))
             A = I-K@H
             self.P=A@self.P@A.T+K@R@K.T  # Joseph
             self.P=(self.P+self.P.T)/2

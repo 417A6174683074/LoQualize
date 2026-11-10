@@ -6,7 +6,10 @@ if __name__ == "__main__" and not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import numpy as np
-from my_world.movements.space import Space2D, Movement2D
+try:
+    from .space import Space2D, Movement2D          # works whatever the repo folder is called
+except ImportError:
+    from my_world.movements.space import Space2D, Movement2D   # running this file directly (needs folder "my_world")
 import matplotlib.pyplot as plt
 
 class Sinus(Movement2D):
