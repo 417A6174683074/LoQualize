@@ -1,2 +1,4 @@
 **/__pycache__/
 *.png
+
+!result_examples/*.png
