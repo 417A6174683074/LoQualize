@@ -126,10 +126,11 @@ def plot(results, field, title, fname, show):
         ax.spines[["top", "right"]].set_visible(False); ax.grid(color="#e1e0d9", lw=0.6)
     fig.suptitle(title, x=0.01, ha="left")
     fig.tight_layout()
-    fig.savefig(fname, dpi=150)
+    fig.savefig(fname, dpi=150, format="png")
     print("saved", fname)
     if show:
         plt.show()
+    plt.close(fig)
 
 
 if __name__ == "__main__":

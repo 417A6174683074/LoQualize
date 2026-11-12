@@ -2,3 +2,4 @@
 *.png
 
 !result_examples/*.png
+.venv/
