@@ -25,9 +25,9 @@ from .presets import IMU_GRADES, imu_kwargs, GNSS, QUANTUM_GRAVIMETER
 
 
 def run(field, grade="navigation", hours=4.0, gnss_until=1800.0, gnss_every=10, dt=1.0,
-        grav_period=60.0, seed=0):
+        grav_period=60.0, seed=0, route_seed=1):
     space = Space2D(pos=np.zeros(2), speed=np.zeros(2), acc=np.zeros(2), time_step=dt)
-    ship = ShipRoute(space, duration=hours * 3600, seed=1)       # same route every run
+    ship = ShipRoute(space, duration=hours * 3600, seed=route_seed)   # default: same route every run
     imu = IMU2D(movement=ship, **imu_kwargs(grade, dt, seed=seed))
     gps = Satellite2D(ship, GNSS["sigma"], GNSS["sigma"], seed=seed + 1)
     grav = Gravimeter2D(ship, field, noise_density_mgal=QUANTUM_GRAVIMETER["noise_density_mgal"],
@@ -126,10 +126,11 @@ def plot(results, field, title, fname, show):
         ax.spines[["top", "right"]].set_visible(False); ax.grid(color="#e1e0d9", lw=0.6)
     fig.suptitle(title, x=0.01, ha="left")
     fig.tight_layout()
-    fig.savefig(fname, dpi=150)
+    fig.savefig(fname, dpi=150, format="png")
     print("saved", fname)
     if show:
         plt.show()
+    plt.close(fig)
 
 
 if __name__ == "__main__":
@@ -138,13 +139,14 @@ if __name__ == "__main__":
     ap.add_argument("--grade", default="navigation", choices=list(IMU_GRADES))
     ap.add_argument("--hours", type=float, default=4.0)
     ap.add_argument("--seeds", type=int, default=1)
+    ap.add_argument("--route-seed", type=int, default=1, help="ship route; same for all runs, only sensor noise varies")
     ap.add_argument("--no-show", action="store_true")
     a = ap.parse_args()
 
     field = GravityField(a.terrain)
     results = []
     for s in range(a.seeds):
-        r = run(field, grade=a.grade, hours=a.hours, seed=s)
+        r = run(field, grade=a.grade, hours=a.hours, seed=s, route_seed=a.route_seed)
         print(f"seed {s}: final error  INS only {r['ins_err'][-1]:7.0f} m | "
               f"INS + gravimeter {r['grav_err'][-1]:7.0f} m")
         results.append(r)
