@@ -28,7 +28,7 @@ let py;
   py=await loadPyodide();
   await py.loadPackage(["numpy","scipy","matplotlib"]);
   py.FS.mkdir("LoQualize");py.FS.mkdir("LoQualize/movements");py.FS.writeFile("LoQualize/__init__.py","");
-  for(const f of FILES) py.FS.writeFile("LoQualize/"+f,await (await fetch(f)).text());
+  for(const f of FILES) py.FS.writeFile("LoQualize/"+f,await (await fetch(f,{cache:"no-cache"})).text());
   py.runPython(`import os;os.environ["MPLBACKEND"]="Agg"`);
   $("status").textContent="Ready.";$("go").disabled=false;
 })().catch(e=>$("status").textContent="Load failed: "+e);
