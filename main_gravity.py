@@ -94,14 +94,17 @@ def plot(results, field, title, fname, show):
     xm = field.xm / 1e3
     im = ax_map.pcolormesh(xm, xm, field.map_grid.T, cmap="Greys", shading="auto")
     fig.colorbar(im, ax=ax_map, shrink=0.8).set_label("map gravity anomaly [mGal]")
-    ax_map.plot(*(r["true"].T / 1e3), color="#1f1f1d", lw=2.5, label="true route")
+    for other in results[1:]:      # other runs' routes (identical, hence invisible, unless --vary-route)
+        ax_map.plot(*(other["true"].T / 1e3), color="#1f1f1d", lw=0.8, alpha=0.35)
+    ax_map.plot(*(r["true"].T / 1e3), color="#1f1f1d", lw=2.5, label="true route (run 0)")
     for key in ("ins", "grav"):
         ax_map.plot(*(r[key][k0:].T / 1e3), color=COLOR[key], lw=2, label=LABEL[key])
     ax_map.plot(*(r["true"][k0] / 1e3), "o", color="#1f1f1d")
     ax_map.annotate("GNSS lost", r["true"][k0] / 1e3, xytext=(-62, -4), textcoords="offset points")
     pad = 12
-    ax_map.set_xlim(r["true"][:, 0].min() / 1e3 - pad, r["true"][:, 0].max() / 1e3 + pad)
-    ax_map.set_ylim(r["true"][:, 1].min() / 1e3 - pad, r["true"][:, 1].max() / 1e3 + pad)
+    allp = np.vstack([q["true"] for q in results])
+    ax_map.set_xlim(allp[:, 0].min() / 1e3 - pad, allp[:, 0].max() / 1e3 + pad)
+    ax_map.set_ylim(allp[:, 1].min() / 1e3 - pad, allp[:, 1].max() / 1e3 + pad)
     ax_map.set_aspect("equal"); ax_map.set_xlabel("east [km]"); ax_map.set_ylabel("north [km]")
     ax_map.legend(loc="upper center", bbox_to_anchor=(0.5, -0.12), fontsize=8, frameon=False, ncol=2)
 
@@ -139,7 +142,7 @@ if __name__ == "__main__":
     ap.add_argument("--grade", default="navigation", choices=list(IMU_GRADES))
     ap.add_argument("--hours", type=float, default=4.0)
     ap.add_argument("--seeds", type=int, default=1)
-    ap.add_argument("--vary-route", action="store_true", help="different ship route per seed (map panel shows run 0)")
+    ap.add_argument("--vary-route", action="store_true", help="different ship route per seed (map panel: run 0 bold, others thin)")
     ap.add_argument("--no-show", action="store_true")
     a = ap.parse_args()
 

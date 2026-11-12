@@ -37,14 +37,14 @@ $("go").onclick=()=>{
   setTimeout(()=>{
     try{
       py.globals.set("cfg",py.toPy({terrain:$("terrain").value,grade:$("grade").value,
-        hours:+$("hours").value,seeds:+$("seeds").value,vary:$("vary").checked}));
+        hours:+$("hours").value,seeds:+$("seeds").value,rs:$("vary").checked?1+Math.floor(Math.random()*1e6):1,vary:$("vary").checked}));
       const [png,txt]=py.runPython(`
 import io
 from LoQualize.main_gravity import run, plot
 from LoQualize.gravity import GravityField
 import numpy as np
 f=GravityField(cfg["terrain"])
-R=[run(f,grade=cfg["grade"],hours=cfg["hours"],seed=s,route_seed=1+s*bool(cfg["vary"])) for s in range(int(cfg["seeds"]))]
+R=[run(f,grade=cfg["grade"],hours=cfg["hours"],seed=s,route_seed=int(cfg["rs"])+s*bool(cfg["vary"])) for s in range(int(cfg["seeds"]))]
 b=io.BytesIO()
 plot(R,f,"GNSS lost after 30 min - %s gravity, %s-grade IMU"%(cfg["terrain"],cfg["grade"]),b,False)
 m=lambda k:np.median([r[k][-1] for r in R])
